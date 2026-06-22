@@ -44,9 +44,9 @@ launch_speed  = 120.0                              # float — decimal number
 
 # type() returns the type object; __name__ gives its readable string.
 print("=== Section 1: Types ===")
-print(f"  {type(mission_label).__name__!r:8s}  {mission_label!r}")
-print(f"  {type(n_rounds).__name__!r:8s}  {n_rounds}")
-print(f"  {type(launch_speed).__name__!r:8s}  {launch_speed}")
+print(f"  {type(mission_label).__name__:8s}  {mission_label}")
+print(f"  {type(n_rounds).__name__:8s}  {n_rounds}")
+print(f"  {type(launch_speed).__name__:8s}  {launch_speed}")
 
 # Strings support methods; split() will reappear in the functions file.
 print(f"\n  mission_label.upper()  → {mission_label.upper()}")
