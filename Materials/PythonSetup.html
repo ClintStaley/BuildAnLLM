@@ -1,0 +1,153 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/4.0.0/github-markdown.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/styles/default.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/markdown-it-texmath/css/texmath.min.css">
+<link rel="stylesheet" href="file:///c:\Users\clint\.vscode\extensions\goessner.mdmath-2.7.4\themes\default\style.css">
+
+</head>
+<body class="markdown-body">
+<span id="markdown-mermaid" aria-hidden="true" data-config="{&quot;darkModeTheme&quot;:&quot;dark&quot;,&quot;lightModeTheme&quot;:&quot;default&quot;,&quot;maxTextSize&quot;:50000,&quot;clickDrag&quot;:&quot;alt&quot;,&quot;showControls&quot;:&quot;onHoverOrFocus&quot;,&quot;resizable&quot;:true,&quot;maxHeight&quot;:&quot;&quot;}"></span>
+				<h1 dir="auto" id="python-setup">Python Setup</h1>
+<h2 dir="auto" id="general-notes">General Notes</h2>
+<p dir="auto">Here's the quick picture of how things fit together:</p>
+<ul dir="auto">
+<li dir="auto"><strong>Python interpreter</strong> — runs your <code>.py</code> files. You install it once per machine.</li>
+<li dir="auto"><strong>pip</strong> — Python's package manager. You use it to install libraries like NumPy, Matplotlib, etc. (<code>pip install numpy</code>).</li>
+<li dir="auto"><strong>PyTorch</strong> — the ML framework we'll use. It needs a version that matches your system (CPU-only vs. CUDA GPU).</li>
+</ul>
+<p dir="auto"><strong>CUDA</strong> is NVIDIA's GPU compute platform. If you have an NVIDIA GPU, PyTorch can use it to run training <em>much</em> faster — but only if the PyTorch build matches your installed CUDA version. If you have no NVIDIA GPU (or you're on a Mac), you'll use CPU-only PyTorch, which is fine for learning.</p>
+<hr dir="auto">
+<h2 dir="auto" id="python-installation">Python Installation</h2>
+<ol dir="auto">
+<li dir="auto">Go to <strong><a href="https://www.python.org/downloads/">python.org/downloads</a></strong> — it auto-detects your OS and suggests the latest stable release (3.12.x as of mid-2025). Download and run the installer.</li>
+</ol>
+<p dir="auto"><strong>Windows:</strong></p>
+<ul dir="auto">
+<li dir="auto">✅ Check <strong>&quot;Add Python to PATH&quot;</strong> during install — easy to miss, causes headaches if skipped.</li>
+<li dir="auto">Use the default install location.</li>
+<li dir="auto">Verify in a terminal: <code>python --version</code></li>
+</ul>
+<p dir="auto"><strong>Mac:</strong></p>
+<ul dir="auto">
+<li dir="auto">The system Python (<code>/usr/bin/python3</code>) is outdated — install fresh from python.org.</li>
+<li dir="auto">After install, use <code>python3</code> and <code>pip3</code> commands (not <code>python</code>/<code>pip</code>).</li>
+<li dir="auto">Verify: <code>python3 --version</code></li>
+</ul>
+<p dir="auto"><strong>Install useful ML packages</strong> (after Python is set up):</p>
+<pre><code class="code-line language-bash" dir="auto">pip install numpy matplotlib pandas scikit-learn jupyter
+<span class="hljs-comment"># (Mac: use pip3)</span>
+</code></pre>
+<hr dir="auto">
+<h2 dir="auto" id="special-notes-on-cuda">Special Notes on CUDA</h2>
+<p dir="auto"><strong>Only relevant if you have an NVIDIA GPU.</strong> Skip this section if you're on a Mac or have no discrete NVIDIA GPU.</p>
+<p dir="auto"><strong>Step 1 — Find your CUDA version:</strong></p>
+<ul dir="auto">
+<li dir="auto">Open a terminal and run: <code>nvidia-smi</code>, which ships with your NVIDIA display driver — no extra installs needed.</li>
+<li dir="auto">The top-right of the output shows something like <code>CUDA Version: 12.4</code> — note that number.</li>
+<li dir="auto">If <code>nvidia-smi</code> isn't found, your GPU driver needs installing/updating:
+get it from <a href="https://www.nvidia.com/en-us/drivers/">nvidia.com/drivers</a>.</li>
+</ul>
+<p dir="auto"><strong>Step 2 — Pick the matching PyTorch build:</strong></p>
+<ul dir="auto">
+<li dir="auto">When you get to <a href="https://pytorch.org/get-started/locally/">pytorch.org/get-started/locally</a>, select the CUDA version that is <strong>≤ your installed version</strong> (e.g., if you have CUDA 12.4, pick the CUDA 12.4 or 12.1 PyTorch build).</li>
+</ul>
+<blockquote dir="auto">
+<p dir="auto"><strong>Mac note:</strong> Macs use Apple Silicon (M1/M2/M3) or Intel — neither supports CUDA. PyTorch has Apple MPS (Metal) support for Apple Silicon, which gives some GPU acceleration. The pytorch.org configurator handles this automatically.</p>
+</blockquote>
+<hr dir="auto">
+<h2 dir="auto" id="pytorch-installation">PyTorch Installation</h2>
+<p dir="auto">Go to <strong><a href="https://pytorch.org/get-started/locally/">pytorch.org/get-started/locally</a></strong> and use the configurator:</p>
+<table dir="auto">
+<thead dir="auto">
+<tr dir="auto">
+<th>Option</th>
+<th>Your pick</th>
+</tr>
+</thead>
+<tbody dir="auto">
+<tr dir="auto">
+<td>PyTorch Build</td>
+<td>Stable</td>
+</tr>
+<tr dir="auto">
+<td>Your OS</td>
+<td>Windows / Mac</td>
+</tr>
+<tr dir="auto">
+<td>Package</td>
+<td>Pip</td>
+</tr>
+<tr dir="auto">
+<td>Language</td>
+<td>Python</td>
+</tr>
+<tr dir="auto">
+<td>Compute Platform</td>
+<td>CUDA 12.x <em>or</em> CPU <em>or</em> MPS (Mac)</td>
+</tr>
+</tbody>
+</table>
+<p dir="auto">Copy and run the generated command. It looks something like:</p>
+<pre><code class="code-line language-bash" dir="auto"><span class="hljs-comment"># CPU-only example:</span>
+pip install torch torchvision torchaudio
+
+<span class="hljs-comment"># CUDA 12.4 example:</span>
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+</code></pre>
+<p dir="auto">This may take a few minutes — the CUDA build is ~2 GB.</p>
+<hr dir="auto">
+<h2 dir="auto" id="verification">Verification</h2>
+<p dir="auto">Run these scripts to confirm everything works.</p>
+<p dir="auto"><strong>1. Python basics</strong></p>
+<pre><code class="code-line language-python" dir="auto"><span class="hljs-keyword">import</span> sys
+<span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Python <span class="hljs-subst">{sys.version}</span>&quot;</span>)
+
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+a = np.array([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>])
+<span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;NumPy:&quot;</span>, a * <span class="hljs-number">2</span>)
+</code></pre>
+<p dir="auto"><strong>2. PyTorch basics</strong></p>
+<pre><code class="code-line language-python" dir="auto"><span class="hljs-keyword">import</span> torch
+<span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;PyTorch version: <span class="hljs-subst">{torch.__version__}</span>&quot;</span>)
+
+x = torch.tensor([<span class="hljs-number">1.0</span>, <span class="hljs-number">2.0</span>, <span class="hljs-number">3.0</span>])
+<span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Tensor:&quot;</span>, x)
+<span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Mean:&quot;</span>, x.mean())
+</code></pre>
+<p dir="auto"><strong>3. CUDA check (skip if CPU-only)</strong></p>
+<pre><code class="code-line language-python" dir="auto"><span class="hljs-keyword">import</span> torch
+<span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;CUDA available:&quot;</span>, torch.cuda.is_available())
+<span class="hljs-keyword">if</span> torch.cuda.is_available():
+    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;GPU:&quot;</span>, torch.cuda.get_device_name(<span class="hljs-number">0</span>))
+    x = torch.tensor([<span class="hljs-number">1.0</span>, <span class="hljs-number">2.0</span>]).cuda()
+    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Tensor on GPU:&quot;</span>, x)
+</code></pre>
+<p dir="auto">If <code>cuda.is_available()</code> returns <code>False</code> when you expect <code>True</code>, double-check that your PyTorch CUDA build matches <code>nvidia-smi</code>'s CUDA version.</p>
+<hr dir="auto">
+<h2 dir="auto" id="useful-links">Useful Links</h2>
+<p dir="auto"><strong>PyTorch</strong></p>
+<ul dir="auto">
+<li dir="auto"><a href="https://docs.pytorch.org/tutorials/beginner/basics/intro.html">pytorch.org/tutorials/beginner/basics/intro.html</a> — Official &quot;Learn the Basics&quot; series. Covers tensors, datasets, model building, training loops. Start here once you're set up.</li>
+<li dir="auto"><a href="https://pytorch.org/docs/stable/index.html">pytorch.org/docs</a> — Full API reference. Useful when you want to look up a specific function.</li>
+</ul>
+<p dir="auto"><strong>Python</strong></p>
+<ul dir="auto">
+<li dir="auto"><a href="https://docs.python.org/3/tutorial/index.html">docs.python.org/3/tutorial</a> — Official Python tutorial. Good reference for language fundamentals (lists, dicts, classes, etc.) if you need a refresher.</li>
+</ul>
+<p dir="auto"><strong>Learning ML concepts</strong></p>
+<ul dir="auto">
+<li dir="auto"><a href="https://www.fast.ai/">fast.ai</a> — Practical deep learning course, free, uses PyTorch. Very hands-on and beginner-friendly.</li>
+<li dir="auto"><a href="https://d2l.ai/">d2l.ai</a> — &quot;Dive into Deep Learning&quot; — a free interactive textbook with PyTorch code for every concept. More thorough than fast.ai.</li>
+</ul>
+<p dir="auto"><strong>Debugging / community</strong></p>
+<ul dir="auto">
+<li dir="auto">First resort for debugging: paste your error message into Claude, ChatGPT, or similar — describe your OS and GPU too. Usually faster than searching forums.</li>
+<li dir="auto"><a href="https://discuss.pytorch.org/">PyTorch Forums</a> — Official community forum, good for less common questions.</li>
+</ul>
+
+</body>
+</html>
