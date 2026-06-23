@@ -68,49 +68,6 @@
 ### Python Basics
    * Basic Python concepts: interpreter, compiler, pip, packages
    * Python examples
-
-Illustrate string, int, float vars
-Basic math ops and use of math library
-Illustrate 1-D lists, 2-D, 3-D
-Shallow/deep copy
-Printing using f-strings
-Python control structures: if/elif/else, while, for
-Function calls
-Basic torch tensors and operations
-class design, objects
-exception handling
-list/map comprehensions
-range indexing
-namedtuples (actually not that common in deep learning code, but I want students to know them)
-
-
-Suggested example case, implemented per our agreement first using raw lists, then 
-
-1. Use simple variables to set up azimuth and elevation angles, and launch speed (degrees for angles, to require translation), and determine from this the projectile's landing spot as a time, x, y triple, assuming origin as launch point, and no air resistance.  
-
-2. Do the same, but for a randomly chosen set of 100 such azimuth/elevation/speed values, in three parallel lists, arriving at a 100x3 2-D list.  Do this with a for-loop, and also with a comprehension.
-
-3. Express point 2 as a function accepting the number of targets, a namedtuple giving azimuth and velocity range (altitude is assumed 0 to 90, though perhaps that can be an optional arg to illustrate *args) and returning an Nx3 list.  This allows us to build large examples to demonstrate speed of e.g. numpy or Pytorch
-
-4. Generate from the function a 100x3 result and play around with it to demonstrate list concepts and lead into Pytorch accelerated versions, e.g. determine the bounds of the box into which the projectiles fall, find the centroid of their falling locations, etc.  Maybe this is a function returning a raw tuple of stats, inviting unpacking the tuple on the calling end.  
-
-5. Another function might, e.g. determine which two points are closest in the generated set, inviting nested loops in a raw form, and a more sophisticated Pytorch pairwise matrix generation in the second version.  (Let's avoid getting into fancy algorithms for this known problem -- just straight pairwise compares)
-
-6. Let's have these functions report their runtime in mS, possibly just by printing it on each execution ?  This allows us to illustrate faster runtime when they are converted to Pytorch.
-
-Next Version
-
-1. Obviously, what we have so far invites a simple "TargetRange" class, with constructor to make the point set, and methods on it.  Revision of the function version into a class would make sense.  Here, we could also add more methods to sneak in a few more concepts, e.g. truthy/falsey, if-constructs, etc.
-
-Third version
-
-1. Finally, we convert the whole class to Pytorch, preferably without an explicit Python loop anywere in it.  
-
-Fourth version
-
-1. And, we revise TargetRange into TargetRanges, adding a third dimension with several different sets of targets generated (optional constructor parameter, defaulting to 1) and 3-D Pytorch tensors, with attendant opportunities to e.g. find closest pairs of points within each set, returning an array of pairs, or finding closest across all sets.  Ditto for bounds, centroids, etc..  This exercises various Pytorch broadcasting patterns.
-
-
    * Appendix A in Raschka
    * https://sebastianraschka.com/blog/2020/numpy-intro.html
 
@@ -122,24 +79,42 @@ Fourth version
 ## Ch 1 Raschke
 
 ## Ch 2 Raschke
+### Intro Tokenizing
+   * Rough explanation of tokenizing to start with -- BPE at end is the real algorithm
+      * Still useful to understand Python text manip for LLMs
+      * Preprocessing w REs at bottom of p 23
+      * Brief comment on regular expressions -- not testable material in this course
+   * List of words converts to a vocab dictionary in Listing 2.2
+   * Converter (assuming addition of <unk> to vocab) in Listing 2.4
+   * General principle: create tokens representing common text strings, with ids.
+### BPE
+   * This is the main method
+   * Illustrate with bottles of beer song from exercise:
+      * first merges: [((' ', 'o'), ' o', 18), ((' ', 'b'), ' b', 18), (('t', 't'), 'tt', 9), (('tt', 'l'), 'ttl', 9), (('ttl', 'e'), 'ttle', 9)]
 
-### 2.3
-   * Constructors and classes
-   * Review list comprehensions, if item.strip(), etc.
-### 2.4
-   * all_tokens = sorted(list(set(preprocessed)))
-   * Notion of batch sizes
-   * Listing 2.4 -- merge unk insertion into ids = statement
-### 2.5
-   * Deeper look at BPE, per gmail Claude convo
+### (Need clear description of NN here, to understand differentiability)    
+### Output
+   * Word embedding not matching any embedding.
+   * Various "closeness" metrics: dot product, cosine, euclidean
+   * Results in a set of possible choices, but not a probability distribution
+   * Softmax
+      * $\pi(z_i) = \frac{e^{z_i}}{\sum_{j=1}^K e^{z_j}}$
+         * Output equivalent.  Softmax function
+      * Try softmax on [0, -1, 0, 2]
+      * Is it a prob distribution?
+      * What happens if all values have 1 added to them?
+         * Relative values, not absolute
+      * Why not just "max"?
+         * For considerable range of weights, doesn't change, thus no partial derivative
+
+### Need discussion of training process: batches, SGD, epochs, etc.
 
 ### 2.6
+   * After NN discussion and training ideas
    * Pytorch tensors appear here and need prior review
    * Need to clarify what he's doing with targets equal in length to inputs, rather than one word??
    * Inheritance appears in Listing 2.5
    * DataLoader and DataSet classes as example Python doc
-
-
 
 ## Deep Learning (neural networks)
  * NN basics
@@ -153,12 +128,6 @@ Fourth version
     * Training is searching in <fill in> dimension space.
  * Brief overview of gradient descent
 	 * And we'll use prebuilt tools but...
-
- * Full notation for NN
-   * Initial input layer 0
-   * wij is from j to i
-   * activation function
-   * ILQs on notation just to be sure it's understood
  * Layers as matrix multiplications
    * Each neuron does a vector dot product on outputs from prior layer, plus a bias
    * write out W matrix in wij form to show why it works well
@@ -176,12 +145,11 @@ Fourth version
 		* Rounded heaviside step function
  * NN Training
    * Use set of known correct inputs and output as examples
-     * Examples in our case are [cals, sweetnes] => [dietSoda, veggies, dessert, starch]
    * Start with random weights
    * Try samples, determine error, adjust weights to reduce error
    * When error is low, or zero, for samples, (hopefully) unknown samples are correctly classified as well
  * Gradient descent "tweaking" method
-   * Weights of net are a "space" in their own right 12-dimensional in our case
+   * Weights of net are a "space" in their own right.
    * Each "point" in the weight space exhibits some inaccuracy or "loss"
      * Thus, we can think of a "loss function" or "cost function" on the domain of weight space.
 	 * An exact loss function might be sum of squares of difference between actual and computed outcome on each output
@@ -220,30 +188,6 @@ Fourth version
       * Adding weights themselves to the loss function encourages reduced weight.
       * For deep learning, best done by cW^2 cost, ensuring positive value.
     
-## Improvements to SGD for high-dimensional space
-  * Use survey paper
-  * Simple SGD
-  * Momentum
-  * Nestorov
-    * Use gradient *as it will be*
-    * Diagram from paper
-  * Adagrad
-    * **per-dimension learning rate!!**
-    * Notation: t for time, i for which dimension/feature
-    * G matrix idea.  
-      * Individual coeffient view
-      * Full matrix view and vector mult
-        (* Concept of square root of matrix)
-      * Originally correlation matrix, but too hard, so diagonal
-    * Adagrad slows down with time
-  * Adadelta
-    * Fix slowdown problem by decaying average of magnitudes
-    * Subtle issue in that $\nu$ is arbitrary scale
-    * Replace it with average movement
-      * RMSprop is Adadelta without this
-  * Adam 
-    * Mix in momentum with RMSprop
-    
 ## Ch 11 and optimization of NN training
   * Big idea re variance across layers
       * "Signal strength" is variance of inputs and outputs
@@ -258,27 +202,7 @@ Fourth version
       * Eq 11-1 p 360
       * What does this say about per-value variance?
       * Note small tweaks for different activation functions
-  * Normalization
-  * Activation functions
-    * Relu, sigmoid, leaky relu reminders
-    * Balance non-saturation with nonlinearity
-    * Relu and leaky relu "bounce" problem
-      * Why would it "bounce"?
-    * Elu solution: linear on positive fades into $\alpha(e^z-1)$
-      * Value at 0?
-      * Alpha is like leaky relu alpha
-      * Derivative?  ($\alpha e^z$ fading into 1)
-      * Power vs speed tradeoff
-      * Specific SELU parameterization is self-normalizing under specific circumstances
-    * GELU, Swish, Mish..
-      * "swoop" at near-origin negative.
-      * $z\sigma(\beta z)$
-        * Track what this does intuitively
-        * Good balance of easy to compute and right shape
-      * Various others, Mish, ets but refinements get rarified
-      * Lots of empiricism in these results
-        * Answer questions on any, but know relu, sigmoid, leaky relu, elu, and swish
-    * Batch Normalization
+  * Batch Normalization
       * Follow eq 11-4 on p 368
       * Difference between $\mu, \sigma$ and $\gamma, \beta$
         * First are rolling-average obtained direct from data
