@@ -35,6 +35,7 @@
   * Emphasize pre/post-lecture help
      * **It's OK to ask for help!**
 
+## Ch 1 Raschke
 ## Readings
   * Raschke Ch 1, App A to 
   * At least spend 10 min on 3B1B
@@ -68,64 +69,17 @@
 ### Python Basics
    * Basic Python concepts: interpreter, compiler, pip, packages
    * Python examples
-
-Illustrate string, int, float vars
-Basic math ops and use of math library
-Illustrate 1-D lists, 2-D, 3-D
-Shallow/deep copy
-Printing using f-strings
-Python control structures: if/elif/else, while, for
-Function calls
-Basic torch tensors and operations
-class design, objects
-exception handling
-list/map comprehensions
-range indexing
-namedtuples (actually not that common in deep learning code, but I want students to know them)
-
-
-Suggested example case, implemented per our agreement first using raw lists, then 
-
-1. Use simple variables to set up azimuth and elevation angles, and launch speed (degrees for angles, to require translation), and determine from this the projectile's landing spot as a time, x, y triple, assuming origin as launch point, and no air resistance.  
-
-2. Do the same, but for a randomly chosen set of 100 such azimuth/elevation/speed values, in three parallel lists, arriving at a 100x3 2-D list.  Do this with a for-loop, and also with a comprehension.
-
-3. Express point 2 as a function accepting the number of targets, a namedtuple giving azimuth and velocity range (altitude is assumed 0 to 90, though perhaps that can be an optional arg to illustrate *args) and returning an Nx3 list.  This allows us to build large examples to demonstrate speed of e.g. numpy or Pytorch
-
-4. Generate from the function a 100x3 result and play around with it to demonstrate list concepts and lead into Pytorch accelerated versions, e.g. determine the bounds of the box into which the projectiles fall, find the centroid of their falling locations, etc.  Maybe this is a function returning a raw tuple of stats, inviting unpacking the tuple on the calling end.  
-
-5. Another function might, e.g. determine which two points are closest in the generated set, inviting nested loops in a raw form, and a more sophisticated Pytorch pairwise matrix generation in the second version.  (Let's avoid getting into fancy algorithms for this known problem -- just straight pairwise compares)
-
-6. Let's have these functions report their runtime in mS, possibly just by printing it on each execution ?  This allows us to illustrate faster runtime when they are converted to Pytorch.
-
-Next Version
-
-1. Obviously, what we have so far invites a simple "TargetRange" class, with constructor to make the point set, and methods on it.  Revision of the function version into a class would make sense.  Here, we could also add more methods to sneak in a few more concepts, e.g. truthy/falsey, if-constructs, etc.
-
-Third version
-
-1. Finally, we convert the whole class to Pytorch, preferably without an explicit Python loop anywere in it.  
-
-Fourth version
-
-1. And, we revise TargetRange into TargetRanges, adding a third dimension with several different sets of targets generated (optional constructor parameter, defaulting to 1) and 3-D Pytorch tensors, with attendant opportunities to e.g. find closest pairs of points within each set, returning an array of pairs, or finding closest across all sets.  Ditto for bounds, centroids, etc..  This exercises various Pytorch broadcasting patterns.
-
-
    * Appendix A in Raschka
    * https://sebastianraschka.com/blog/2020/numpy-intro.html
 
-## Pattern Recognition and ML Overview
-   * Patterns
-   * Pytorch tensors
-   * Training vs test data sets (also validation)
-
-## Ch 1 Raschke
+# Week 2
 
 ## Ch 2 Raschke
 
 ### 2.3
    * Constructors and classes
    * Review list comprehensions, if item.strip(), etc.
+   
 ### 2.4
    * all_tokens = sorted(list(set(preprocessed)))
    * Notion of batch sizes
@@ -219,65 +173,6 @@ Fourth version
       * Large weights tend to overspecialize/overfit.  Demanding limited 
       * Adding weights themselves to the loss function encourages reduced weight.
       * For deep learning, best done by cW^2 cost, ensuring positive value.
-    
-## Improvements to SGD for high-dimensional space
-  * Use survey paper
-  * Simple SGD
-  * Momentum
-  * Nestorov
-    * Use gradient *as it will be*
-    * Diagram from paper
-  * Adagrad
-    * **per-dimension learning rate!!**
-    * Notation: t for time, i for which dimension/feature
-    * G matrix idea.  
-      * Individual coeffient view
-      * Full matrix view and vector mult
-        (* Concept of square root of matrix)
-      * Originally correlation matrix, but too hard, so diagonal
-    * Adagrad slows down with time
-  * Adadelta
-    * Fix slowdown problem by decaying average of magnitudes
-    * Subtle issue in that $\nu$ is arbitrary scale
-    * Replace it with average movement
-      * RMSprop is Adadelta without this
-  * Adam 
-    * Mix in momentum with RMSprop
-    
-## Ch 11 and optimization of NN training
-  * Big idea re variance across layers
-      * "Signal strength" is variance of inputs and outputs
-      * Want this to remain steady across layers
-      * Ditto for gradients (limit exploding/vanishing gradients)
-
-  * Initialization
-    * Why not all-zeros?
-    * Glorot initialization or He initialization
-      * Big advance
-      * Initialize for steady-variance
-      * Eq 11-1 p 360
-      * What does this say about per-value variance?
-      * Note small tweaks for different activation functions
-  * Normalization
-  * Activation functions
-    * Relu, sigmoid, leaky relu reminders
-    * Balance non-saturation with nonlinearity
-    * Relu and leaky relu "bounce" problem
-      * Why would it "bounce"?
-    * Elu solution: linear on positive fades into $\alpha(e^z-1)$
-      * Value at 0?
-      * Alpha is like leaky relu alpha
-      * Derivative?  ($\alpha e^z$ fading into 1)
-      * Power vs speed tradeoff
-      * Specific SELU parameterization is self-normalizing under specific circumstances
-    * GELU, Swish, Mish..
-      * "swoop" at near-origin negative.
-      * $z\sigma(\beta z)$
-        * Track what this does intuitively
-        * Good balance of easy to compute and right shape
-      * Various others, Mish, ets but refinements get rarified
-      * Lots of empiricism in these results
-        * Answer questions on any, but know relu, sigmoid, leaky relu, elu, and swish
     * Batch Normalization
       * Follow eq 11-4 on p 368
       * Difference between $\mu, \sigma$ and $\gamma, \beta$
