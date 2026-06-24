@@ -107,7 +107,7 @@
       * Why not just "max"?
          * For considerable range of weights, doesn't change, thus no partial derivative
 
-### Need discussion of training process: batches, SGD, epochs, etc.
+### Discussion of training process: batches, SGD, epochs, etc.
 
 ### 2.6
    * After NN discussion and training ideas
@@ -115,6 +115,39 @@
    * Need to clarify what he's doing with targets equal in length to inputs, rather than one word??
    * Inheritance appears in Listing 2.5
    * DataLoader and DataSet classes as example Python doc
+
+## Chapter 3
+   * Skip to 3.3.  No need for RNNs or LSTMs
+### 3.3.1
+   * Fig 3.7.  Idea of weighted context.
+      * Note that this is very oversimplified and that there are multiple layers to add
+   * 2-digit values on p 37 - note for reference
+   * Fig 3.8 showing dot product attention
+      * Check a few using p37 data, not the 1-digit values
+   * Note discussion of dot product is on point here.
+   * p 59 Simple sum normalization.  
+   * p 60 Softmax calc
+      * Book offers some reasons but not all.  What else?
+         * Dot products can be negative!
+      * Smarter version with torch? 
+         * Overflow is the danger - underflow just gives a 0
+         * So?? Subtract max value from all values to ensure no exponential > 1.
+   * Code above Fig 3.10, follow, and then rewrite w/o loops
+      * (att_weights.reshape(6,1)*inputs).sum(dim=0)
+### 3.3.2
+   * Big 2-D tensor attention grid on p 61 is a central idea.  Will compute differently, but same concept.  What is t.sum(dim=1)?
+   * Code at Fig 3.12 and after is useful tensor lesson.  Loops, or just 
+      * `inputs @ inputs.T)`
+      * What shapes?  (6,3) and (3,6)... 
+      * resultant tensor is (6,6) 
+      * How fast?  Does ".t" require data copying?
+         * No -- just viewwpoint shift, and all in C/Rust, so much faster
+   * Full operation `torch.softmax(inputs @ inputs.T, dim = -1).  
+      * What alternate dim?  dim = 1.
+      * Why that dim?
+   * And finally attn_weights @ inputs
+      * Shapes? (6,6) (6,3) -> (6,3)
+      * What does each vector multiply do?  (x, y, z values, each probability-weighted per )
 
 ## Deep Learning (neural networks)
  * NN basics

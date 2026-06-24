@@ -8,7 +8,7 @@ Assume $A = \begin{bmatrix}1\\2\\2\end{bmatrix}B = \begin{bmatrix}2\\-1\\2\end{b
 
 2. What is the angle between A and B? Between B and C? 
 
-**Ans: $AB = cos^{-1}(4/(3 * 3)) = 1.11R, 63.6\degree; CD = cos^{-1}(-2/(3 * 2)) = 1.91R, 109.4\degree$**
+**Ans: $AB = cos^{-1}(4/(3 * 3)) = 1.11R, 63.6\degree; CD = cos^{-1}(-2/(3*2)) = 1.91R, 109.5\degree$**
 
 ## Matrix Multiplication
 
