@@ -75,25 +75,42 @@
 # Week 2
 
 ## Ch 2 Raschke
+### Intro Tokenizing
+   * Rough explanation of tokenizing to start with -- BPE at end is the real algorithm
+      * Still useful to understand Python text manip for LLMs
+      * Preprocessing w REs at bottom of p 23
+      * Brief comment on regular expressions -- not testable material in this course
+   * List of words converts to a vocab dictionary in Listing 2.2
+   * Converter (assuming addition of <unk> to vocab) in Listing 2.4
+   * General principle: create tokens representing common text strings, with ids.
+### BPE
+   * This is the main method
+   * Illustrate with bottles of beer song from exercise:
+      * first merges: [((' ', 'o'), ' o', 18), ((' ', 'b'), ' b', 18), (('t', 't'), 'tt', 9), (('tt', 'l'), 'ttl', 9), (('ttl', 'e'), 'ttle', 9)]
 
-### 2.3
-   * Constructors and classes
-   * Review list comprehensions, if item.strip(), etc.
-   
-### 2.4
-   * all_tokens = sorted(list(set(preprocessed)))
-   * Notion of batch sizes
-   * Listing 2.4 -- merge unk insertion into ids = statement
-### 2.5
-   * Deeper look at BPE, per gmail Claude convo
+### (Need clear description of NN here, to understand differentiability)    
+### Output
+   * Word embedding not matching any embedding.
+   * Various "closeness" metrics: dot product, cosine, euclidean
+   * Results in a set of possible choices, but not a probability distribution
+   * Softmax
+      * $\pi(z_i) = \frac{e^{z_i}}{\sum_{j=1}^K e^{z_j}}$
+         * Output equivalent.  Softmax function
+      * Try softmax on [0, -1, 0, 2]
+      * Is it a prob distribution?
+      * What happens if all values have 1 added to them?
+         * Relative values, not absolute
+      * Why not just "max"?
+         * For considerable range of weights, doesn't change, thus no partial derivative
+
+### Need discussion of training process: batches, SGD, epochs, etc.
 
 ### 2.6
+   * After NN discussion and training ideas
    * Pytorch tensors appear here and need prior review
    * Need to clarify what he's doing with targets equal in length to inputs, rather than one word??
    * Inheritance appears in Listing 2.5
    * DataLoader and DataSet classes as example Python doc
-
-
 
 ## Deep Learning (neural networks)
  * NN basics
@@ -107,12 +124,6 @@
     * Training is searching in <fill in> dimension space.
  * Brief overview of gradient descent
 	 * And we'll use prebuilt tools but...
-
- * Full notation for NN
-   * Initial input layer 0
-   * wij is from j to i
-   * activation function
-   * ILQs on notation just to be sure it's understood
  * Layers as matrix multiplications
    * Each neuron does a vector dot product on outputs from prior layer, plus a bias
    * write out W matrix in wij form to show why it works well
@@ -130,12 +141,11 @@
 		* Rounded heaviside step function
  * NN Training
    * Use set of known correct inputs and output as examples
-     * Examples in our case are [cals, sweetnes] => [dietSoda, veggies, dessert, starch]
    * Start with random weights
    * Try samples, determine error, adjust weights to reduce error
    * When error is low, or zero, for samples, (hopefully) unknown samples are correctly classified as well
  * Gradient descent "tweaking" method
-   * Weights of net are a "space" in their own right 12-dimensional in our case
+   * Weights of net are a "space" in their own right.
    * Each "point" in the weight space exhibits some inaccuracy or "loss"
      * Thus, we can think of a "loss function" or "cost function" on the domain of weight space.
 	 * An exact loss function might be sum of squares of difference between actual and computed outcome on each output
@@ -173,7 +183,22 @@
       * Large weights tend to overspecialize/overfit.  Demanding limited 
       * Adding weights themselves to the loss function encourages reduced weight.
       * For deep learning, best done by cW^2 cost, ensuring positive value.
-    * Batch Normalization
+    
+## Ch 11 and optimization of NN training
+  * Big idea re variance across layers
+      * "Signal strength" is variance of inputs and outputs
+      * Want this to remain steady across layers
+      * Ditto for gradients (limit exploding/vanishing gradients)
+
+  * Initialization
+    * Why not all-zeros?
+    * Glorot initialization or He initialization
+      * Big advance
+      * Initialize for steady-variance
+      * Eq 11-1 p 360
+      * What does this say about per-value variance?
+      * Note small tweaks for different activation functions
+  * Batch Normalization
       * Follow eq 11-4 on p 368
       * Difference between $\mu, \sigma$ and $\gamma, \beta$
         * First are rolling-average obtained direct from data
