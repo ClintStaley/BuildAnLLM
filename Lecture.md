@@ -179,6 +179,9 @@
      * So, divide by $\sqrt{k}$ to compensate
    * p70 multiplication to get actual value
 
+
+---------
+
 ### 3.4.2 Attention class
    * Review SelfAttention_v1, including "forward" method
    * Figure 3.18 is good summary
@@ -203,6 +206,9 @@
    * 50% dropout is a good norm -- no clear rules -- and be clear it's only during training.  Turned off in execution/inference
 
 ### 3.5.3 Full Causal Attention class
+   * Note the addition of a batch layer now
+      * Done by simple duplication of inputs; real case would be different per batch
+      * How does this affect code in the class?  Let's see.
    * In __init__
       * Unpack torch.stack call -- new shape?  (2, 6, 3)
       * register_buffer and the bigger issue of moving data to/from GPU
@@ -222,11 +228,49 @@
          * (num_tokens, num_tokens)*(b, num_tokens, d_out)
          * 2 matmuls
          * 2*num_tokens*num_tokens*d_out multiplies
+      * was "b" used anywhere in "forward"?  Why not?
       * Using the ca object -- () is mapped to forward
 
 ### Multihead Attn
+* A single Q, K and V matrix for attention, not one per token
+* May want different kinds/rules of attention
 
+### 3.6.3 Direct Multihead
+* Listing 3.4
+  * Unpack the list comprehension
+  * torch.cat -- we get wider value
+  * Run on p 85 results in (2,6,4) shape
+  * Do exercise 3.2 in class
 
+### 3.6.2 Efficient Multihead
+* Principal concept: Can pack many matrix multiplies into one
+   * Say I want four Q-matrices for four heads, each 3x2
+   * Create a 3x8 matrix AllQ stacking them left to right
+   * X @ AllQ -> (num_tokens, 8)
+   * Or, same for linear layer.  Need 4 (3 in / 2 out)? One (3 in / 8 out)
+* MultiHeadAttention
+   * First code that will actually be in our final implementation
+   * __init__
+     * d_out is now the full concatenated value dim
+     * Follow division into heads, Linears that encompass all heads..
+   * forward
+     * All QKV for all heads computed at once
+     * reshape to separate them by view
+     * Transpose so that num_heads is an earlier dimension, and broadcasting will span heads
+     * Standard ops then, up to the context_vec
+     * Transpose it to regroup heads under tokens
+     * contiguous for efficiency since the transpose after the @ values will break continguity
+
+### 4 Building the LLM
+* Structural overview
+* Listing 4.1
+   * Meaning of "*" unpacker
+   * Positional embeddings
+   * in_idx is simple batch of token sequences, device resident
+   * Point of "logits" output (will convert to probability)
+   * Preview ideas: layer normalization, logit-vector for classification, 
+* 
+------------------
 ## Deep Learning (neural networks)
  * NN basics
    * Perceptron or neuron
