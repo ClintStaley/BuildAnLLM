@@ -103,7 +103,7 @@
       * Why not just "max"?
          * For considerable range of weights, doesn't change, thus no partial derivative
 
-### Need discussion of training process: batches, SGD, epochs, etc.
+### Discussion of training process: batches, SGD, epochs, etc.
 
 ### 2.6
    * After NN discussion and training ideas
@@ -111,6 +111,124 @@
    * Need to clarify what he's doing with targets equal in length to inputs, rather than one word??
    * Inheritance appears in Listing 2.5
    * DataLoader and DataSet classes as example Python doc
+
+## Chapter 3
+   * Skip to 3.3.  No need for RNNs or LSTMs
+### 3.3.1
+   * Fig 3.7.  Idea of weighted context.
+      * Note that this is very oversimplified and that there are multiple layers to add
+   * 2-digit values on p 37 - note for reference
+   * Fig 3.8 showing dot product attention
+      * Check a few using p37 data, not the 1-digit values
+   * Note discussion of dot product is on point here.
+   * p 59 Simple sum normalization.  
+   * p 60 Softmax calc
+      * Book offers some reasons but not all.  What else?
+         * Dot products can be negative!
+      * Smarter version with torch? 
+         * Overflow is the danger - underflow just gives a 0
+         * So?? Subtract max value from all values to ensure no exponential > 1.
+   * Code above Fig 3.10, follow, and then rewrite w/o loops
+      * (att_weights.reshape(6,1)*inputs).sum(dim=0)
+### 3.3.2
+   * Big 2-D tensor attention grid on p 61 is a central idea.  Will compute differently, but same concept.  What is t.sum(dim=1)?
+   * Code at Fig 3.12 and after is useful tensor lesson.  Loops, or just 
+      * `inputs @ inputs.T
+      * What shapes?  (6,3) and (3,6)... 
+      * resultant tensor is (6,6) 
+      * How fast?  Does ".T" require data copying?
+         * No -- just viewwpoint shift, and all in C/Rust, so much faster
+   * Full operation `torch.softmax(inputs @ inputs.T, dim = -1).  
+      * What alternate dim?  dim = 1.
+      * Why that dim?
+   * And finally attn_weights @ inputs
+      * Shapes? (6,6) (6,3) -> (6,3)
+      * What does each vector multiply do?  (x, y, z values, each probability-weighted per distribution)
+      * Can we put inputs on the left? Only with inputs.T @ attn_weights.T, and result would be (3,6)
+### 3.4
+   * General story about k, q, v.  
+      * Each token gets to provide a value to be mixed, not just itself.  Allows flexible extraction of relevant aspects
+      * Each token will not simply attend to another by dot product
+        * Such a rule means only "like" tokens attend.
+      * Each token advertises a "key" .. "what I offer"
+      * and posts a "query" -- "what I seek"
+      * Matrices (linear transforms) for all three, drawing on token.
+         * Generally from d to lower dimension, a 2-power fraction of d (text just does 3 -> 2 but that's for simplicity)
+      * Fig 3.14 illustrates
+   * p66 setup of the matrices
+      * Significance of "Parameter" -- will be training/tweaking
+      * NOTE: only one set of matrices for all the tokens.  How a query is derived, or a key, or a value, is the same, though different token sources for each.
+      * Tensor code above Fig 3.15.
+         * No need for one-row preliminary now -- should be able to follow this.
+         * All three: (n, d) @ (d, k) -> (n,k), with n = 6, d = 3, k = 2
+         * Real values might be n = 100000; d = 12000, k = 1500
+   * p68 above Fig 3.16
+     * Again, jump straight to full tensor code for $W_2$
+     * Rename attn_weights as attn_prbs to avoid double use of "weight"
+   * What's with the $/k^2$?
+     * As key dimension rises, what happens to "spread" of k*q products?
+     * Say a given k*q product has average? (0) and stddev(1).  95% chance within -3/3.  But if we have 10000 of them? (200 are > 3stdev)
+     * Value of highest, given normal distribution, rises as $\sqrt{k}$
+     * So?  We have a softmax anyway.. 
+     * Try sm(2, 1, 0) vs sm(6, 3, 0)... [.665, .245, .09] vs [.95, .05, .00]                                
+     * Uniform add/sub has no effect, but uniform mult is different
+     * So, divide by $\sqrt{k}$ to compensate
+   * An aside on "temperature" (division by in order to "flatten" the distribution)
+   * p70 multiplication to get actual value
+
+### 3.4.2 Attention class
+   * Review SelfAttention_v1, including "forward" method
+   * Figure 3.18 is good summary
+   * And SelfAttention_v2.  
+      * Linear layer is a fully connected NN layer, incl bias.
+      * How does this replace a matrix multiply ?
+         * Note the code turns off bias by default...
+         * Affine vs linear reinforcement...
+### 3.5 Causal attention
+   * We are training QKV matrices to be used in inference.
+   * In training, should token 2 attend to token 5, for instance?
+### 3.5.1 Masking for causality
+   * Fig 3.19
+   * Mask code and renorming
+      * Is it the same as softmax on just the remaining items?
+      * Why not just set 0s in upper triangle before SM? (Not the same as no attention)
+   * Can avoid renorm, however, via -inf mapping before SM
+### 3.5.2 Dropout
+   * Underlying problem -- overfitting
+   * Hinton's dropout story
+   * One way to look at dropout is that we're training many different networks, more loosely connected within, and making them agree.
+   * 50% dropout is a good norm -- no clear rules -- and be clear it's only during training.  Turned off in execution/inference
+
+### 3.5.3 Full Causal Attention class
+   * In __init__
+      * Unpack torch.stack call -- new shape?  (2, 6, 3)
+      * register_buffer and the bigger issue of moving data to/from GPU
+   * In forward:
+      * unpacking assign of shape
+      * dimensions of keys, queries, etc? in terms of b, num_tokens, d_in (broadcasting..)
+         * (b, num_tokens, d_out) 
+      * transpose(1,2)!  What dimensions being transposed?
+         * numtokens, d_out -> d_out, numTokens
+         * so matrix mult gives?  (b, num_tokens, num_tokens)
+         * Note value of shape tracking
+      * How many separate prob distributions generated by the softmax?
+         * b*num_tokens
+         * Why dim = -1?  Could it be a positive?  
+      * Is att_weights still a prob distr after dropout??
+      * Dim of the final matmul for context_vec?  How many mat muls? How many scalar muls, adds?
+         * (num_tokens, num_tokens)*(b, num_tokens, d_out)
+         * 2 matmuls
+         * 2*num_tokens*num_tokens*d_out multiplies
+      * Using the ca object -- () is mapped to forward
+
+### 3.6 Multihead Attn
+* Only one matrix each of K, Q, V -- what if we want different kinds of attention?
+* Multiple "attention heads"
+   * In effect, we get more values per token, one set for each of several attn heads
+* Listing 3.4
+   * Shape of head(x)?  Of final output?  (n, d_out) (n, d_out*numHeads)
+   * Exercise 3.2
+
 
 ## Deep Learning (neural networks)
  * NN basics
