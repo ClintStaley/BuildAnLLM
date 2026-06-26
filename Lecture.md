@@ -263,22 +263,68 @@
      * contiguous for efficiency since the transpose after the @ values will break continguity
 
 ### 4 Building the LLM
-* Structural overview
+* Structural overview p98
 * Listing 4.1
-   * Meaning of "*" unpacker
-   * Positional embeddings
-   * in_idx is simple batch of token sequences, device resident
-   * Preview ideas: layer normalization, logit-vector for classification, 
-* Fig 4.4 p 98 overview.  
-   * Note convention of upward data flow (don't blame me)
-* Fig 4.5 p100 normalization
-   * Exploding/vanishing gradients
-   * Fixing this by mean and varieance to 0/1 (remind what variance is)
-   * Brief review of mean/var code on 101
-   * (Note vals are again truncated in diagram -- more accurate in table below)
-   * Deeper story is that the layer *picks* a mean and variance, not necessarily 0/1, based on SGD
-* p 99 logit output (will softmax eventually)
-------------------
+  * Meaning of "*" unpacker
+  * Positional embeddings
+  * in_idx is simple batch of token sequences, device resident
+  * Point of "logits" output (will convert to probability)
+  * Preview ideas: layer normalization, logit-vector for classification, 
+* Final logits output p99
+  * Embedding for each token in each batch...
+* Layer normalization
+  * Reminder of vanishing/exploding gradients
+  * Especially a problem early in training when all is random
+  * Solution is to take mean and variance across an entire activation (remind what mean and variance are) and adjust to make these 0/1
+  * BUT, in practice individual activations may need to skew and scale, so we also keep a learned set of adjustments to these.  
+  * Deconstruct Listing 4.2
+     * Parameters
+     * mean/var calculation and reason for keepDim (want to broadcast)
+     * norm_x is the "vanilla"
+     * return expression is the individual tweak to the vanilla.  Ask
+     number of operations implied (emb_dim each of mult and add)
+* GELU
+  * Qualitative discussion of Relu strength (simplicity, extended positive gradient) and weakness (dead neurons, no gradient below zero, discontinuous
+  * Qualitative discussion of GELU shape, using Fig 4.8.  
+     * "Swoosh" below zero helps with dead neurons, encourages positive pull
+     * Approximation makes compute easier.
+     * There is deeper math justifying formal definition, but beyond class scope.
+* Listing 4.4 Simple FFN
+  * Added piece after Attn block, as we'll see. 
+  * Brief overview.  Number of trainable weights? (8(emb_dim)^2)
+* Residual connections (aka "shortcut" in Raschke)
+  * Fig 4.12 
+  * Needs embedding dim to be consistent
+  * Note that in right side, each sub network has a partial *direct* path to output, and thus some degree of *direct* impact
+  * Reduces vanishing gradients, as indicated in the diagram.
+  * Original reason was this, when introduced 10 years ago for image recognition.
+  * Newer way to understand is that each unit is learning to *adjust* the input from the prior one.  It is the computed outputs that are the real "add", not the shortcut paths.  "Residual" means "remaining bit to add for correctness".  
+  * Listing 4.5 and retrieval of gradient information
+     * Possibly more on this next week, App A has greater detail.
+* Fig 4.13 Transformer Block
+  * This is the core module in a transformer LLM, repeated N times
+  * Note our attention block is in the middle
+  * The pattern of layer norms, residuals, etc. is partly experience, but has theoretical underpinning too.  Beyond course scope
+  * Listing 4.6 
+     * Actually pretty straightforward after all preceding work.
+     * follow init and forward code
+* Fig 4.15 Putting it all together
+  * Full detail on that initial sketch at the start of the chapter
+  * Note the 12x
+  * Understand input and output (still not quite at choosing word)
+  * Follow listing 4.7 briefly
+  * Critically, understand in/out shape on p. 120, for 4-token context
+* Read up on parameter counts, and expect HW exercise like Ex 4.1, but bigger
+  * Parameter counting is a good way to be sure you understand the architecture
+* Deconstruct Listing 4.8
+  * Understand idx -- current context (in e.g. 2 batches)
+  * Logits shape (batch, seq, vocab vector) (relate back to example output)
+  * Pick out batch/logits
+  * idx_next via argmax.  Alternative?
+  * cat and reason for keepDim
+* final result on p 127
+
+s------------------
 ## Deep Learning (neural networks)
  * NN basics
    * Perceptron or neuron

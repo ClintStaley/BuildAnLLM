@@ -60,8 +60,8 @@ print("Scores shape: ", scores.shape)
 # Q2: In the scores tensor, explain what each
 # of the four dimensions represents, and specifically what a single value
 # of scores, say scores[0, 1, 2, 4] means in plain English, including the meaning
-# of each index.  What is the attention relationship between the 2nd and 3rd 
-# words in the first attention head, in the second batch?
+# of each index.  What element describes how much the 3rd token is attended to by
+# the second token in the first attention head, in the second batch?
 #
 # A2: (write your answer here)
 #
