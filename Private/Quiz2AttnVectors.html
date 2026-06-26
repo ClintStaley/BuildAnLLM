@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/4.0.0/github-markdown.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/styles/default.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/markdown-it-texmath/css/texmath.min.css">
+<link rel="stylesheet" href="file:///c:\Users\clint\.vscode\extensions\goessner.mdmath-2.7.4\themes\default\style.css">
+
+</head>
+<body class="markdown-body">
+<span id="markdown-mermaid" aria-hidden="true" data-config="{&quot;darkModeTheme&quot;:&quot;dark&quot;,&quot;lightModeTheme&quot;:&quot;default&quot;,&quot;maxTextSize&quot;:50000,&quot;clickDrag&quot;:&quot;alt&quot;,&quot;showControls&quot;:&quot;onHoverOrFocus&quot;,&quot;resizable&quot;:true,&quot;maxHeight&quot;:&quot;&quot;}"></span>
+				<h1 dir="auto" id="quiz-2">Quiz 2</h1>
+<p dir="auto">Name___________________________________</p>
+<p dir="auto">Assume the following code for the questions below.</p>
+<pre><code dir="auto">batch_size, num_heads, seq_len, head_dim = 2, 4, 8, 10
+
+K = torch.randint(-5, 5, (batch_size, num_heads, seq_len, head_dim)).float()
+Q = torch.randint(-5, 5, (batch_size, num_heads, seq_len, head_dim)).float()
+
+K_t = K.transpose( ___, ___) 
+scores = Q @ K_t         
+</code></pre>
+<p dir="auto"><strong>1. 4pts</strong> Fill in the missing transpose parameters -- with <em>nonnegative values</em> -- so that the multiplication will work.</p>
+<pre><code dir="auto">
+</code></pre>
+<p dir="auto"><strong>2. 6pts</strong>
+Write code that prints the logit (note there is no softmax) value for the degree to which the third token in the sequence is &quot;of interest to&quot; or is &quot;attended by&quot; the fifth token, for the first batch and the second head.</p>
+<pre><code dir="auto">
+</code></pre>
+<p dir="auto"><strong>3. 5pts</strong> What does this print: <code>print(scores.shape)</code>?</p>
+<pre><code dir="auto">
+</code></pre>
+<p dir="auto"><strong>4. 5pts</strong> How many individual multiplications are performed by <code>scores = Q @ K_t</code>?</p>
+<pre><code dir="auto">
+</code></pre>
+<p dir="auto"><strong>5. 4pts</strong> How long will the fully concatenated result value of the implied multihead attention structure be?</p>
+<pre><code dir="auto">
+</code></pre>
+
+</body>
+</html>
