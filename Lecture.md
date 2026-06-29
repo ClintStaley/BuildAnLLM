@@ -298,7 +298,7 @@
   * Note that in right side, each sub network has a partial *direct* path to output, and thus some degree of *direct* impact
   * Reduces vanishing gradients, as indicated in the diagram.
   * Original reason was this, when introduced 10 years ago for image recognition.
-  * Newer way to understand is that each unit is learning to *adjust* the input from the prior one.  It is the computed outputs that are the real "add", not the shortcut paths.  "Residual" means "remaining bit to add for correctness".  
+  * Newer way to understand is that each unit is learning to *adjust* the input from the prior one.  It is the computed outputs that are the real "add", not the shortcut paths.  "Residual" means "remaining error to correct".  
   * Listing 4.5 and retrieval of gradient information
      * Possibly more on this next week, App A has greater detail.
 * Fig 4.13 Transformer Block
