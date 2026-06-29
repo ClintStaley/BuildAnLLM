@@ -179,9 +179,6 @@
      * So, divide by $\sqrt{k}$ to compensate
    * p70 multiplication to get actual value
 
-
----------
-
 ### 3.4.2 Attention class
    * Review SelfAttention_v1, including "forward" method
    * Figure 3.18 is good summary
@@ -323,7 +320,84 @@
   * cat and reason for keepDim
 * final result on p 127
 
-s------------------
+## Ch 5 LLM Training
+### Intro 
+* Review p124, generate_text_simple, and example use on p132
+   * Just pass over the tokenizer utility routines -- not used later
+   * Point is what the output looks like: (batch, context, vocab)
+
+### 5.1.2 Measuring the Error
+* Perspective.
+   * This is the "function" making our SGD surface.  
+   * It is a many variable function, determined by all the trainable weights.
+   * Every possible weight set results in an error E.
+   * Each weight W offers a calculable $\frac{\partial E}{\partial W}$
+* Fig 5.4 ideas
+  * Input of token vector
+  * Output of logit vectors, one per token, thus context x batchsize of them
+  * Pick largest logit (or do softmax and highest probability)
+* How to determine an error function.  Seems simple, but not so easy.
+  * Needs to vary smoothly.
+  * Must encourage large logit for correct token
+  * Must encourage small logit for wrong token -- why??
+  * Will take error across all words and samples in a batch, so need proper weighing.
+  * What if "error" is negative of logit of desired token?
+     * Does this improve full distribution?
+  * So, use softmax and probability instead.
+     * Error is $1-p_t$?  Low probabiity is worse than close to high
+     * Use $-ln(p_t)$ for probs that ahould be 1.  Error for .9, for .1, for .001?
+     * What about the 0s?  -- Fixing the 1's automatically fixes them too.
+
+### 5.1.3 Running the Training
+* Review Listing 2.5 and Listing 2.6 pp38/39 for the form of training sets/batches
+   * DataSet = "TrainingPairMaker"
+   * DataLoader == "TrainingBatchMaker"
+* pp142-143
+   * Training vs validation concept
+      * Dual loaders
+   * Understand output shape of loaders **(b, context) in in/out batch pairs**
+      * x[0, 5] ==  y[ ?? ] **y[0, 4]**
+* Listing 5.2 p144
+   * "to" device
+   * functional.cross_entropy.  
+      * Bigger idea, perhaps more later, but does the $-ln(p_t)$ compute across the tensor
+      * Passed logits, interestingly.  Why?
+         * Consider sm on logits followed by ln.  Get back to original logit
+         * Saves compute, and underflow with small logits
+   * flatten operation to make batch and token dims into one
+
+* p145: training vs validation errors
+* Rundown on optimizers
+   * model.parameters() tensor
+   * p 149 setup of optimizer
+   * Accumulates derivatives across sample runs.
+      * Standard usage: Set all sum-derives to 0
+      * Run the subject model, and do a "backward" call on final result
+      * Call "step" on the optimizer to collect derivatives
+      * Repeat
+   * Derivatives automatically computed by suitably configured Pytorch tensors
+      * This is a killer feature of PyTorch (see example raw code in BackProp.py)
+   * Various refinements to SGD
+      * Can be a week long lecture series in own right, but salient ideas:
+        * Local optima not a problem; saddle points are.
+        * Momentum to build up speed on low slopes
+        * Differential skew in favor of slowly varying dimensions
+* Listing 5.3
+   * Already saw calc_loss_batch and calc_loss_loader
+   * Reminder on epochs
+   * Follow optimizer update
+   * Look at evaluate_model
+      * model.eval() -- impact e.g. on dropout layers
+         * pair with model.train() for courtesy to caller
+      * Is it training? torch.no_grad()
+      * Calls calc_loss_loader and calc_loss_batch.  
+   * Look at generate_and_print_sample
+      * context_size cleverly obtained.  Drill into this.
+      * Do rest
+   * Sample run
+   * matplotlib 
+
+# Background materials------------------
 ## Deep Learning (neural networks)
  * NN basics
    * Perceptron or neuron
@@ -423,27 +497,7 @@ s------------------
 * Reference Thickstun
 * Queries, Keys, Values
    * Go over the math.  Check matrix dimensions
-   * Example: "adjective query seeks noun word".  Assume some embedding direction for each.
-
-### Positional Encoding
-* One-hot adds too many dimensions with large context window
-* Single positional value is too imprecise; doesn't allow clean delineation of different distances
-* Sin/cos model
-  * Unique positioning within one wavelength, per Fig 16-9
-  * What range of "wavelength"s?  **6.28 to 62,800**
-  * Addition in effect gives existing semantics plus location, e.g. "noun at 5 distance"
-  * Dot product of two positions at $\beta$ distance, with first at $\alpha$:
-    * Visualize as two vectors at $(cos(alpha), sin(alpha))$ and $(cos(\alpha+\beta), sin(\alpha+\beta))$
-    * How do they change as $\alpha$ increases?  **Rotate together**
-    * How does dot product change?  **It doesn't**
-    * Range of unambiguous distance? **pi**
-  * Does it skew toward more fine distances or more coarse ones?
-    * What is wavelength at d/2?  **$\tau \sqrt(10000) = 628**
-    * So 6.28 to 628 get half the bandwidth, 628 to 10,000 the other half
-
-### Top Layer
-  * Big MLP with huge softmax output
-  * Concept of temperature
+   * Example: "adjective query seeks noun word". 
 
 ### Use as translator (thus "transformer")
 * One of many configurations

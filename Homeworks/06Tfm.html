@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/4.0.0/github-markdown.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/styles/default.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/markdown-it-texmath/css/texmath.min.css">
+<link rel="stylesheet" href="file:///c:\Users\clint\.vscode\extensions\goessner.mdmath-2.7.4\themes\default\style.css">
+
+</head>
+<body class="markdown-body">
+<span id="markdown-mermaid" aria-hidden="true" data-config="{&quot;darkModeTheme&quot;:&quot;dark&quot;,&quot;lightModeTheme&quot;:&quot;default&quot;,&quot;maxTextSize&quot;:50000,&quot;clickDrag&quot;:&quot;alt&quot;,&quot;showControls&quot;:&quot;onHoverOrFocus&quot;,&quot;resizable&quot;:true,&quot;maxHeight&quot;:&quot;&quot;}"></span>
+				<h1 dir="auto" id="llm-implementation">LLM Implementation</h1>
+<h2 dir="auto" id="reading">Reading</h2>
+<p dir="auto">Raschke, Chapter 4</p>
+<h2 dir="auto" id="problems">Problems</h2>
+<ol dir="auto">
+<li dir="auto">
+<p dir="auto">This question pertains to the design of TransformerBlock, and its immediate surroundings in the overall GPTModel.  (See Figs 4.13, 4.15 and Listing 4.6).</p>
+<p dir="auto"><strong>a.</strong> Why does it make architectural sense for the multihead attention module, and the feed forward module, both to have no final activation layer?</p>
+<p dir="auto"><strong>b.</strong> Raschka charaacterizes <code>out_proj</code> in MultiHeadAttention as &quot;optional&quot;. But, what essential problem with the attention head's function in the larger TransformerBlock would arise if we omit <code>out_proj</code>?  Consider the structure of the input to <code>out_proj</code> and the use of the MultiHeadAttention block's output in TransformerBlock.</p>
+<p dir="auto"><strong>c.</strong> Must the shape of the input tensor to a TransformerBlock be the same as the output tensor, or might there be useful variations e.g. in the embedding size between sequential TransformerBlocks?  There is a clear answer to this question due to the design of the TransformerBlock</p>
+<p dir="auto"><strong>d.</strong> Develop an equation for the number of trainable weights in a single, entire TransformerBlock, based on the relevant variables in <strong>init</strong>.  Use only variables that matter.  For the dimensions of GPT-2 (p 95) what is the trainable weight count (should be just over 7.08 million)?</p>
+<p dir="auto"><strong>e.</strong> In Listing 4.6, we have two different LayerNorm modules, but a single Dropout module serves for both dropout actions in <code>forward</code>.  What do you think is the difference between these two types of module that demands two distinct LayerNorms?</p>
+</li>
+<li dir="auto">
+<p dir="auto">Extend the work from problem 1 to arrive at an equation for the total trainable weights in the entire GPTModel, referencing Listing 4.7 and the table on p 95</p>
+<p dir="auto"><strong>a.</strong> What are the trainable weights in the embedding layer and in the linear output layer, combined.  (Value a bit over 77 million)</p>
+<p dir="auto"><strong>b.</strong> What about the positional embedding layer? (A little over 3/4 million.)</p>
+<p dir="auto"><strong>c.</strong> And the TransfomerBlocks, in their entirety? (over 28 million)</p>
+<p dir="auto"><strong>d.</strong> And the final LayerNorm?  Minor but part of the deal.</p>
+<p dir="auto"><strong>e.</strong> Calculate the grand total, and validate against the bottom of p120.</p>
+</li>
+<li dir="auto">
+<p dir="auto">In Listing 4.8, we use <code>argmax</code> to choose a token.  But if we instead chose according to the full softmax distribution, what might happen?  For a given input to <code>out_head</code>, for instance, would there be some tokens with a zero chance of being chosen?</p>
+</li>
+<li dir="auto">
+<p dir="auto">In Listing 4.8, if we omitted the line <code>logits = logits[:, -1, :]</code></p>
+<p dir="auto"><strong>a.</strong> And what would be the shape of <code>probas</code> and <code>idx_next</code> in this case?</p>
+<p dir="auto"><strong>b.</strong> Considering input tensor <code>idx</code>, what element of it is likely to match idx_next[0, -2] in this case?</p>
+</li>
+<li dir="auto">
+<p dir="auto">The text describes GPT-2 as having &quot;tied weights&quot; for <code>tok_emb</code> and <code>out_head</code>.  To understand this, we first have to imagine <code>tok_emb</code> not as a lookup table of embeddings but as a Linear layer, thus: <code>tok_emb = nn.Linear(cfg[vocab_size&quot;], cfg[&quot;emb_dim&quot;])</code> with 50257 inputs and 768 outputs.  It is fed a &quot;one-hot&quot; input designating the input token.  E.g. for token 1, it would get input [0, 1, 0, 0, 0, .....]</p>
+<p dir="auto"><strong>a.</strong> In this view, where would the embedding for token 1 appear?  What weights of <code>tok_emb</code> would have that embedding?</p>
+<p dir="auto"><strong>b.</strong> Why would a bias be inappropriate in this case?</p>
+</li>
+<li dir="auto">
+<p dir="auto">Now imagine <code>out_head</code> as the same as the <code>tok_emb</code> we just discussed, but turned &quot;upside down&quot;.  (Consult the line creating <code>out_head</code> on p. 119).  All the weights are identical to those for <code>tok_emb</code>.</p>
+<p dir="auto"><strong>a.</strong> Say we input to <code>out_head</code> a perfect match for one of the token embeddings.  Is it guaranteed to choose that token?  Why or why not?</p>
+<p dir="auto"><strong>b.</strong> It is documented that learned embeddings for common terms have higher magnitude (vector length) than less common terms.  So, for instance, the magnitude of &quot;cat&quot; may exceed that of &quot;feline&quot;, even if both point generally in the same direction in embedding space.  What impact might this have if we present the embedding for &quot;feline&quot; to <code>out_head</code>?</p>
+</li>
+</ol>
+
+</body>
+</html>
