@@ -35,6 +35,7 @@
   * Emphasize pre/post-lecture help
      * **It's OK to ask for help!**
 
+## Ch 1 Raschke
 ## Readings
   * Raschke Ch 1, App A to 
   * At least spend 10 min on 3B1B
@@ -71,12 +72,7 @@
    * Appendix A in Raschka
    * https://sebastianraschka.com/blog/2020/numpy-intro.html
 
-## Pattern Recognition and ML Overview
-   * Patterns
-   * Pytorch tensors
-   * Training vs test data sets (also validation)
-
-## Ch 1 Raschke
+# Week 2
 
 ## Ch 2 Raschke
 ### Intro Tokenizing
@@ -137,10 +133,10 @@
 ### 3.3.2
    * Big 2-D tensor attention grid on p 61 is a central idea.  Will compute differently, but same concept.  What is t.sum(dim=1)?
    * Code at Fig 3.12 and after is useful tensor lesson.  Loops, or just 
-      * `inputs @ inputs.T)`
+      * `inputs @ inputs.T
       * What shapes?  (6,3) and (3,6)... 
       * resultant tensor is (6,6) 
-      * How fast?  Does ".t" require data copying?
+      * How fast?  Does ".T" require data copying?
          * No -- just viewwpoint shift, and all in C/Rust, so much faster
    * Full operation `torch.softmax(inputs @ inputs.T, dim = -1).  
       * What alternate dim?  dim = 1.
@@ -177,6 +173,7 @@
      * Try sm(2, 1, 0) vs sm(6, 3, 0)... [.665, .245, .09] vs [.95, .05, .00]                                
      * Uniform add/sub has no effect, but uniform mult is different
      * So, divide by $\sqrt{k}$ to compensate
+   * An aside on "temperature" (division by in order to "flatten" the distribution)
    * p70 multiplication to get actual value
 
 ### 3.4.2 Attention class
@@ -228,9 +225,13 @@
       * was "b" used anywhere in "forward"?  Why not?
       * Using the ca object -- () is mapped to forward
 
-### Multihead Attn
-* A single Q, K and V matrix for attention, not one per token
-* May want different kinds/rules of attention
+### 3.6 Multihead Attn
+* Only one matrix each of K, Q, V -- what if we want different kinds of attention?
+* Multiple "attention heads"
+   * In effect, we get more values per token, one set for each of several attn heads
+* Listing 3.4
+   * Shape of head(x)?  Of final output?  (n, d_out) (n, d_out*numHeads)
+   * Exercise 3.2
 
 ### 3.6.3 Direct Multihead
 * Listing 3.4

@@ -55,7 +55,7 @@ token_ids = [word2id[w] for w in words]
 print("number of words in corpus:", len(words))
 print("vocab size:", len(vocab))
 
-# Q1: Before printing it, predict len(token_ids) given len(words) above.
+# Q1: Before printing it, predict relationship betweenn len(token_ids) and len(words) above.
 # Then print token_ids and confirm. What is the exact value?
 #
 # A1 (predicted, then confirmed): (write the exact integer here)
