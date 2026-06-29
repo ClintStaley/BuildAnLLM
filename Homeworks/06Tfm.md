@@ -22,11 +22,9 @@ Raschke, Chapter 4
 
    **a.** What are the trainable weights in the embedding layer and in the linear output layer, combined.  (Value a bit over 77 million)
 
-
    **b.** What about the positional embedding layer? (A little over 3/4 million.)
 
-
-   **c.** And the TransfomerBlocks, in their entirety? (over 28 million)
+   **c.** And the TransfomerBlocks, in their entirety? (over 85 million)
 
    **d.** And the final LayerNorm?  Minor but part of the deal.
 

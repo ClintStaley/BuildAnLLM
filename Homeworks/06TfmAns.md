@@ -39,7 +39,7 @@ This question pertain to the design of TransformerBlock, and its immediate surro
 
    **Ans: $seqLen*embed = 786,432$**
 
-   **c.** And the TransfomerBlocks, in their entirety? (over 28 million)
+   **c.** And the TransfomerBlocks, in their entirety? (over 85 million)
 
    **Ans: $numLayers(W) = 85026816$**
 
@@ -51,7 +51,7 @@ This question pertain to the design of TransformerBlock, and its immediate surro
 
    **Ans: 106,303,488**
 
-3. In Listing 4.8, we use `argmax` to choose a token.  But if we instead chose according to the full softmax distribution, what might happen?  For a given input to `out_head`, for instance, would there be some tokens with a zero chance of being chosen?
+3. In Listing 4.8, we use `argmax` to choose a token.  But if we instead chose probabilistically according to the full softmax distribution, what might happen?  For a given input to `out_head`, for instance, would there be some tokens with a zero chance of being chosen?
 
 **Ans: No.  No logit would be -inf, so all tokens would have a chance**
 
