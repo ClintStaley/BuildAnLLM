@@ -383,6 +383,9 @@
         * Local optima not a problem; saddle points are.
         * Momentum to build up speed on low slopes
         * Differential skew in favor of slowly varying dimensions
+
+---- Tues
+
 * Listing 5.3
    * Already saw calc_loss_batch and calc_loss_loader
    * Reminder on epochs
@@ -396,9 +399,15 @@
       * context_size cleverly obtained.  Drill into this.
       * Do rest
    * Sample run
-   * matplotlib 
 
+* matplotlib display, very briefly
+   * Library for drawing graphs, barcharts, plots, etc. 
 
+* topk logic Listing 5.4 p 157
+   * topk function
+   * Ask about -inf
+   * Expense of the topk -- how is it done?  (partial quicksort)
+   * 
    
 
 # Background materials------------------

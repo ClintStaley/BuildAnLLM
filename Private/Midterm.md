@@ -6,42 +6,46 @@ Name_________________________________________________
 Give terms for each of the following definitions, spelling correctly.
 
 AI that creates documents, pictures, etc rather than simply analyzing and classifying patterns
-**Generative AI**
 
-Form of AI in which the program learns automatically from examples.  **Machine Learning**
+Form of AI in which the program learns automatically from examples.  
 
-New term for what was called "neural networks"  **Deep Learning**
+New term for what was called "neural networks" 
 
-Kind of neural network that generates images or movies  **Diffusion Model**
+Kind of neural network that generates images or movies 
 
-Nonlinear function that frequently follows a linear neural network layer  **Activation function**
+Nonlinear function that frequently follows a linear neural network layer  
 
-Specific example of such a function that is built on Relu and gaussian distributions  **GELU**
+Specific example of such a function that is built on Relu and gaussian distributions  
 
-A connection that adds the result of a deep learning module to its input.  **Residual Connection**
+A connection that adds the result of a deep learning module to its input.  
 
-One pass through the entire set of training data **Epoch**
+One pass through the entire set of training data 
 
-One set of input/output samples large enough to be a reasonble example on which to optimize **Batch**
+One set of input/output samples large enough to be a reasonble example on which to optimize 
 
-Tokenizing method used by e.g. GPT-2  **Byte Pair Encoding (BPE)**
+Tokenizing method used by e.g. GPT-2  
 
-Deep learning layer that starts with a zero-mean 1-variance output, with individual per-dimension adjustments for mean and variance.  **Layer Normalization**
+Deep learning layer that starts with a zero-mean 1-variance output, with individual per-dimension adjustments for mean and variance.  
+
+
 
 ## 2. 30pts Word Embeddings and Tokenization
 a. 8pts Give an example of two words, with embeddings $E_1, E_2$ for which you might reasonably expect $\frac{E_1\cdot E_2}{|E_1||E_2|} \approx 1$.  Without changing your first two words, give a third word for which $\frac{E_1\cdot E_3}{|E_1||E_3|} \approx -1$.
+```
+First two words:
 
-First two words:  **Synonyms 4pts**
-
-Third Word:  **Antonym 4pts.**
-
+Third Word:
+```
 b. 8pts Assume we have three embeddings $E_1, E_2, E_3$, and $E_1 \cdot E_2 > E_1 \cdot E_3$. Even so, $E_3$ might point more closely than $E_2$ in the same direction as $E_1$?  How?
+```
 
-**Ans: $|E_2| >> |E_3| can cause this 8pts**
 
+```
 c. 14pts If I run BPE as implemented in our homework on the text "abracadabra", with a merge count of 3, what will the token dictionary be, in token number order? (Break pair-ties by alphabetic order, as in the homework code.  You should get 8 tokens total)  
+```
 
-**a b r c d (5pts) ab (3pts) abr (3pts) abra (3pts)**
+
+```
 
 ## 3. 23pts Pytorch
 a. 7pts Here is an interactive Python session working on a Pytorch tensor "pts".  Show the output of the final two prints.  
@@ -57,30 +61,25 @@ print(torch.sum(pts, dim=0))
 
 
 
-```
-**Ans: [3, 9] 7pts**
-```
 print(pts - (torch.sum(pts, dim=-2) / 3)
 
 
 
 ```
-**Ans: \
-[[ 0. -1.]   
- [-2.  0.]\
- [ 2.  1.]]  3x2 with mods 5pts Fully right 4pts**
 
 b. 7pts How far apart in memory are the elements pts.T[0, 0] and pts.T[0, 2]?
-
-**4 numbers apart**
-
+```
+```
 ## 4. 10pts Linear Layer Design
 
 Draw a Linear layer that is equivalent to this matrix:
 
 $\begin{bmatrix}1&2\\3&4\\5&6\end{bmatrix}$
+```
 
-**Ans: 3 in, 2 out (5pts), weights in 12, 34, 56 from each input (5pts)
+
+
+```
 
 ## 5. 20pts MultiHeadAttention
 Below is a truncated selection from MultiHeadAttention.forward.  Write a Torch tensor expression that gives the key value for the second head, in the first batch, third token.
@@ -93,7 +92,6 @@ class MultiHeadAttention(nn.Module):
         pickedKey = ____________________________________
         ....
 ```
-**keys[0 (3pts), 2 (3pts), head_dim:2*head_dim (14pts)]**
 
 ## 6. 27pts Transformer Block
 The code for TransformerBlock.__init__ is below, along with a config dict.
@@ -113,15 +111,15 @@ cfg = {
 class TransformerBlock(nn.Module):
     def __init__(self, cfg):
         super().__init__()
-        self.att = MultiHeadAttention(             # Params: **3*50^2 + 2*2*50 + 50^2 = 10200 15pts**
+        self.att = MultiHeadAttention(             # Params: 
             d_in=cfg["emb_dim"],
             d_out=cfg["emb_dim"],
             context_length=cfg["context_length"],
             num_heads=cfg["n_heads"], 
             dropout=cfg["drop_rate"],
             qkv_bias=cfg["qkv_bias"])
-        self.ff = FeedForward(cfg)                 # Params: 51*200 + 201*50 = 20,250 6pts
-        self.norm1 = LayerNorm(cfg["emb_dim"])     # Params: 2*50 = 100  2pts
-        self.norm2 = LayerNorm(cfg["emb_dim"])     # Params: 2*50 = 100  2pts
-        self.drop_shortcut = nn.Dropout(cfg["drop_rate"])  # Params: 0 2pts
+        self.ff = FeedForward(cfg)                 # Params: 
+        self.norm1 = LayerNorm(cfg["emb_dim"])     # Params: 
+        self.norm2 = LayerNorm(cfg["emb_dim"])     # Params: 
+        self.drop_shortcut = nn.Dropout(cfg["drop_rate"])  # Params: 
 ```

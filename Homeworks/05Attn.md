@@ -21,4 +21,4 @@ Write an equation taking the embedding d_in 'E', d_out 'N', number of heads 'H',
 
    **d.** Given your new design from part c, create an equation for the number of multiplications needed by one run of `forward`.  Note that 4 of the 5 variables will now matter.  And assume for simplicity that the causal masking is omitted and if you know what a "KV cache" is, assume one is not in use.  
 
-   Apply the equation to the two cases cited earlier: (E, N, H, S, B) = (128, 256, 8, 100, 4) and GPT-3's values of (12288, 12288, 96, 2048, 16). (You should get just over 13 million and almost 5 trillion, respectively.)
+   Apply the equation to the two cases cited earlier: (E, N, H, S, B) = (128, 256, 8, 100, 4) and GPT-3's values of (12288, 12288, 96, 2048, 16). (You should get just over 52 million and almost 20 trillion, respectively.)

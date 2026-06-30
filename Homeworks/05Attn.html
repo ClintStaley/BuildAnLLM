@@ -24,7 +24,7 @@
 <p dir="auto"><strong>c.</strong> In chapter 4, we'll find that the input and output tensor dimensions must be the same for the attention block to fit properly into the larger structure of a &quot;transformer block&quot; of which it is the central element.  But, a small adjustment to the design of MultiHeadAttention still permits differing <code>d_in</code> and <code>d_out</code> while ensuring that the returned <code>context_vec</code> has the same dimensions as the input tensor <code>x</code> parameter of <code>forward</code>.  Adjust just a small part of one line in the <strong>init</strong> method to ensure this.  And, revise your equation from a to reflect this change.</p>
 <p dir="auto">This type of adjustment is actually done in more advanced attention block designs that have arisen in the last 5 years or so.</p>
 <p dir="auto"><strong>d.</strong> Given your new design from part c, create an equation for the number of multiplications needed by one run of <code>forward</code>.  Note that 4 of the 5 variables will now matter.  And assume for simplicity that the causal masking is omitted and if you know what a &quot;KV cache&quot; is, assume one is not in use.</p>
-<p dir="auto">Apply the equation to the two cases cited earlier: (E, N, H, S, B) = (128, 256, 8, 100, 4) and GPT-3's values of (12288, 12288, 96, 2048, 16). (You should get just over 13 million and almost 5 trillion, respectively.)</p>
+<p dir="auto">Apply the equation to the two cases cited earlier: (E, N, H, S, B) = (128, 256, 8, 100, 4) and GPT-3's values of (12288, 12288, 96, 2048, 16). (You should get just over 52 million and almost 20 trillion, respectively.)</p>
 
 </body>
 </html>

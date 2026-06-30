@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/4.0.0/github-markdown.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/styles/default.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/markdown-it-texmath/css/texmath.min.css">
+<link rel="stylesheet" href="file:///c:\Users\clint\.vscode\extensions\goessner.mdmath-2.7.4\themes\default\style.css">
+
+</head>
+<body class="markdown-body">
+<span id="markdown-mermaid" aria-hidden="true" data-config="{&quot;darkModeTheme&quot;:&quot;dark&quot;,&quot;lightModeTheme&quot;:&quot;default&quot;,&quot;maxTextSize&quot;:50000,&quot;clickDrag&quot;:&quot;alt&quot;,&quot;showControls&quot;:&quot;onHoverOrFocus&quot;,&quot;resizable&quot;:true,&quot;maxHeight&quot;:&quot;&quot;}"></span>
+				<h1 dir="auto" id="attention">Attention</h1>
+<h2 dir="auto" id="reading">Reading</h2>
+<p dir="auto">Raschke, Ch 3</p>
+<h2 dir="auto" id="problems">Problems</h2>
+<ol dir="auto">
+<li dir="auto">In the attention blocks discussed in the chapter, K, Q, and V all have the same <code>head_dim</code> value.  Must they?  If so, why?  If not, which of them could have a different dim and why?  (Don't worry about how the attention block will fit into a Transformer block at this point -- that's a chapter 4 issue)</li>
+</ol>
+<p dir="auto"><strong>K and Q must have same dim since they are dot-producted, but V may have an independent dim from K,Q</strong></p>
+<ol start="2" dir="auto">
+<li dir="auto">
+<p dir="auto">Write an equation taking the embedding d_in 'E', d_out 'N', number of heads 'H', sequence length 'S', and batch size 'B' of a MultiheadAttention block (Raschke Listing 3.5), and returning the number of trainable parameters/weights the block will have.</p>
+<p dir="auto">a. Derive the needed equation, without LLM help.  Assume that bias for the kqv Linears is false but note that for nn.Linear the default bias is &quot;true&quot;.  What values do you get for: (E, N, H, S, B) = (128, 256, 8, 100, 4) and for GPT-3's values of (12288, 12288, 96, 2048, 16).  As a check, you should get just over 164000 for the first, and just under 604 million for the second.</p>
+</li>
+</ol>
+<p dir="auto"><strong>$P = 3EN + N^2 + N; 164096, 603,992,064</strong></p>
+<p dir="auto">b. Of the five variables specified in part a, three do not in fact affect parameter count.  Which three, and why?</p>
+<p dir="auto"><strong>Sequence length and batch size, since the same computation applies to all tokens in the sequence, and across batches.  And head count, since ultimately we divide ExN matrices/linears into heads, but do not increase their size doing so.</strong></p>
+<p dir="auto">c. In chapter 4, we'll find that the input and output tensor dimensions must be the same for the attention block to fit properly into the larger structure of a &quot;transformer block&quot; of which it is the central element.  But, a small adjustment to the design of MultiHeadAttention still permits differing <code>d_in</code> and <code>d_out</code> while ensuring that the returned <code>context_vec</code> has the same dimensions as the input tensor <code>x</code> parameter of <code>forward</code>.  Adjust just a small part of one line in the <strong>init</strong> method to ensure this.  And, revise your equation from a to reflect this change.</p>
+<p dir="auto"><strong>Ans: out_proj = nn.Linear(d_out, d_in)  P = 4EN + E</strong></p>
+<p dir="auto">This type of adjustment is actually done in more advanced attention block designs that have arisen in the last 5 years or so.</p>
+<p dir="auto">d. Given your new design from part c, create an equation for the number of multiplications needed by one run of <code>forward</code>.  Note that 4 of the 5 variables will now matter.  And assume for simplicity that the causal masking is omitted and if you know what a &quot;KV cache&quot; is, assume one is not in use.</p>
+<p dir="auto">Apply the equation to the two cases cited earlier: (E, N, H, S, B) = (128, 256, 8, 100, 4) and GPT-3's values of (12288, 12288, 96, 2048, 16). (You should get just over 52 million and almost 20 trillion, respectively.)</p>
+<p dir="auto"><strong>Ans: <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mo>=</mo><mn>4</mn><mi>S</mi><mi>B</mi><mi>E</mi><mi>N</mi><mo separator="true">;</mo><mn>52</mn><mo separator="true">,</mo><mn>428</mn><mo separator="true">,</mo><mn>800</mn><mo separator="true">;</mo><mn>1.98</mn><mi>x</mi><mn>1</mn><msup><mn>0</mn><mn>13</mn></msup></mrow><annotation encoding="application/x-tex">M = 4SBEN; 52,428,800; 1.98x10^{13}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">M</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.008548em;vertical-align:-0.19444em;"></span><span class="mord">4</span><span class="mord mathnormal" style="margin-right:0.10903em;">SBEN</span><span class="mpunct">;</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">52</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">428</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">800</span><span class="mpunct">;</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1.98</span><span class="mord mathnormal">x</span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">13</span></span></span></span></span></span></span></span></span></span></span></span></eq></strong></p>
+
+</body>
+</html>

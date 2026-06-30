@@ -21,13 +21,13 @@ Raschke, Ch 3
 
    c. In chapter 4, we'll find that the input and output tensor dimensions must be the same for the attention block to fit properly into the larger structure of a "transformer block" of which it is the central element.  But, a small adjustment to the design of MultiHeadAttention still permits differing `d_in` and `d_out` while ensuring that the returned `context_vec` has the same dimensions as the input tensor `x` parameter of `forward`.  Adjust just a small part of one line in the __init__ method to ensure this.  And, revise your equation from a to reflect this change.
 
-**Ans: out_proj = nn.Linear(d_out, d_in)  P = 4EN + N**
+**Ans: out_proj = nn.Linear(d_out, d_in)  P = 4EN + E**
 
    This type of adjustment is actually done in more advanced attention block designs that have arisen in the last 5 years or so.
 
    d. Given your new design from part c, create an equation for the number of multiplications needed by one run of `forward`.  Note that 4 of the 5 variables will now matter.  And assume for simplicity that the causal masking is omitted and if you know what a "KV cache" is, assume one is not in use.  
 
-   Apply the equation to the two cases cited earlier: (E, N, H, S, B) = (128, 256, 8, 100, 4) and GPT-3's values of (12288, 12288, 96, 2048, 16). (You should get just over 13 million and almost 5 trillion, respectively.)
+   Apply the equation to the two cases cited earlier: (E, N, H, S, B) = (128, 256, 8, 100, 4) and GPT-3's values of (12288, 12288, 96, 2048, 16). (You should get just over 52 million and almost 20 trillion, respectively.)
 
-**Ans: $M = 4SBEN; 13,107,200; 4.95x10^{12}$**
+**Ans: $M = 4SBEN; 52,428,800; 1.98x10^{13}$**
 
