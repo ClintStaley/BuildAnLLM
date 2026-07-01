@@ -5,11 +5,8 @@
 Raschke, Chapter 5
 
 ## Problems
-1. On p 139, why does the flatten call on logits require arguments, while that on targets does not?  
 
-**logits is 3-D and we flatten only the first two dimensions.  Targets has only 2 dims, which we flatten entirely.**
-
-2. Crossentropy is formally defined between two probability distributions p and q of the same domain (same number of possible outcomes), for instance p = [.2, .3, .5] and q = [.3, .4, .3].  H(p,q), is the "crossentropy of q relative to p", and is the p-weighted sum of the negative logs of the corresponding q values. er.
+1. Crossentropy is formally defined between two probability distributions p and q of the same domain (same number of possible outcomes), for instance p = [.2, .3, .5] and q = [.3, .4, .3].  H(p,q), is the "crossentropy of q relative to p", and is the p-weighted sum of the negative logs of the corresponding q values. er.
 
    $H(p,q) = -\sum_i p_i ln(q_i)$
 
@@ -27,13 +24,42 @@ Raschke, Chapter 5
 
    **H(B, A) It's using the 1/N values in B as weights, and weighing the negative log-probabilities corresponding to those, each with 1/N weight**
 
-3. You measure the loss/error value after each batch, and find that it jumps up and down rather than gradually descending. Assuming there's no bug in the implementation, what is the likely explanation and fix? **Batch sizes too small and thus not representative.  Increase batch size**
 
-4. Consider train_loader and val_loader as configured on p. 143, and as originally coded on p39. 
+2. Consider train_loader and val_loader as configured on p. 143, and as originally coded on p39. 
 
-a. How many tokens are essentially wasted -- completely left out of both the training and validation process?  (It will be useful to know that int() truncates, not rounds) **int(5145 * .9) = 4630, so 4360 tokens are in the training set and 515 are in the validation set.  Each batch uses 512 of these, and 4630%512 = 22, but the final batch does include one more token for the output, so 21 are ignored.  If you adjusted stride to 
+   a. How many tokens are wasted -- completely left out of both the training and validation process?  (It will be useful to know that int() truncates, not rounds) 
 
-batch analysis.  Wastage of batches in DataSet??  Overall data size of DataSet.  total data, shifting percentage, wastage.  Redesign stride not to waste. Number of in/out pairs available, etc.
+**int(5145 * .9) = 4630, so 4360 tokens are in the training set and 515 are in the validation set.  Each batch uses 512 of these, and 4630%512 = 22, but the final batch does include one more token for the output, so 21 are ignored in the training set and 2 in the validation for a total of 23 wasted.**  
 
-6. train_model_simple -- pick most costly operations... What happens if we move zero_grad up?  
+   b. Adjust stride in train_loader just enough to increase the number of batches to 10.  How many tokens are left unused in the training data now?
+
+   **A 457 stride uses 457*9+513 = 4626, leaving only 4 unused**
+
+3. In calc_loss_batch, p 144, why does the flatten call on logits require arguments, while that on targets does not?  
+
+**logits is 3-D and we flatten only the first two dimensions.  Targets has only 2 dims, which we flatten entirely.**
+
+4. In `train_model_simple` p147 , which statement do you think is the most expensive in computation, and which is the next-most?  Why?
+
+**The calc_loss_batch class and the loss.backwards() are the contenders.  Any reasonable justification for choosing one as first is fine, though in practice the backwards is more expensive.**
+
+5. In `train_model_simple`, how might you arrange to get he loss/error value after every batch?  What if you found that it jumps up and down rather than gradually descending. What is the likely explanation and fix? **Set eval_freq to 1.  Batch sizes too small and thus not representative.  Increase batch size**
+
+6. In 5.4, what temperature, if any, would cause completely deterministic behavior by the generator -- so that the same word would be produced by the same context every time?  Explain your reasoning mathematically.
+
+**None would do so.  No matter how low the temperature, there will still be some probability distribution, and the multinomial call will have some chance of choosing a different token.**
+
+7. Using an LLM, build a Python program that:
+
+   * Accepts as a commandline argument a positive integer dimension D, and also an optional "-gpu" flag
+   * Creates three Python tensors T2d, and T3d of dimension DxD, and DxDxD, with elements drawn from a normal distribution with mean 0 and variance 4.
+   * Do these two operations: a multiplication of T3d by T2d, arriving at a DxDxD result "scores", and a softmax on the final dimension of scores. For both, record the wallclock running time in mS and report it.
+   * Report the average maximum probability value across all DxD softmax distributions.
+
+Run this program on your local machine first, and try various dimensions up to the point where it runs for more than 15 seconds.  How does the average max probability change with D?  How does the runtime change with D?
+
+Run the program with a -gpu flag if you have a CUDA GPU usable by Pytorch.  How does the runtime change?
+
+Copy the program onto the Blackwell machine, and run the highest dimension you had, both without and with -gpu.  How does the run time vary?
+
 

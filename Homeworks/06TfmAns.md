@@ -82,7 +82,7 @@ This question pertain to the design of TransformerBlock, and its immediate surro
 
 6. Now imagine `out_head` as the same as the `tok_emb` we just discussed, but turned "upside down".  (Consult the line creating `out_head` on p. 119).  All the weights are identical to those for `tok_emb`.
 
-   **a.** Say we input to `out_head` a perfect match for one of the token embeddings.  Is it guaranteed to choose that token?  Why or why not?
+   **a.** Say we input to `out_head` a perfect match for one of the token embeddings.  Is it guaranteed to choose that token if we choose the max logit per the code?  Why or why not?
 
    **No.  Cosine will be a perfect match, but magnitude of other embeddings might compensate.  Other logits and probabilities could be higher**
 
